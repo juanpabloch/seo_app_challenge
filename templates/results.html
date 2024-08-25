@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section>
+    <h1>Resultados</h1>
+
+    <a href="{% url 'home' %}">VOLVER</a>
+</section>
+
+<br><br>
+<section>
+    <p>speed: {{data.speed}}</p>
+    <p>interactive: {{data.interactive}}</p>
+</section>
+
+{% endblock content %}
