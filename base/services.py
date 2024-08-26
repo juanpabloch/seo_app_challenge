@@ -1,31 +1,7 @@
 import requests
-from django.core.exceptions import ObjectDoesNotExist
 
 from core import settings
-from base.models import UrlData, UrlCompareHistory
-import json
-
-
-def get_url_db(url, strategy):
-    data = {}
-    try:
-        data_url = UrlData.objects.get(url=url, strategy=strategy)
-
-        data["find"] = True
-        data["url"] = {
-            "id": data_url.id,
-            "url": data_url.url,
-            "strategy": data_url.strategy,
-            "index": data_url.index,
-            "interactive": data_url.interactive,
-        }
-        
-    except ObjectDoesNotExist:
-        data["find"] = False
-        data["url"] = url
-        data["strategy"] = strategy
-
-    return data
+from base.models import UrlData
 
 
 def get_url_data(url, strategy):
@@ -39,39 +15,34 @@ def get_url_data(url, strategy):
     if settings.API_KEY:
         params["key"] = settings.API_KEY
 
-    response = requests.get(base_url, params=params)
-    result = response.json()
+    try:
+        response = requests.get(base_url, params=params)
+        result = response.json()
 
-    data = {
-        "url": url,
-        "strategy": strategy,
-        "index": round(result['lighthouseResult']['audits']['speed-index']["numericValue"], 3),
-        "interactive": round(result['lighthouseResult']['audits']['interactive']["numericValue"], 3),
-    }
-
+        data = {
+            "url": url,
+            "strategy": strategy,
+            "index": round(result['lighthouseResult']['audits']['speed-index']["numericValue"], 3),
+            "interactive": round(result['lighthouseResult']['audits']['interactive']["numericValue"], 3),
+        }
+    except Exception as err:
+        print("ERROR fetching url data: ", err)
+        return False
+    
     return data
 
 
-def process_data(data):
-    if not data["find"]:
-        try:
-            url_data = get_url_data(data["url"], data["strategy"])
-            url = UrlData.objects.create(**url_data)
-            return {
-                "id": url.id,
-                "url": url.url,
-                "strategy": url.strategy,
-                "index": url.index,
-                "interactive": url.interactive,
-            }
-            
-        except Exception as err:
-            print("ERROR: ", err)
-    else:
-        return data["url"]
+def save_urls_comparison(data):
+    try:
+        UrlData.objects.create(
+            strategy = data["url_1"]["strategy"],
+            url_1 = data["url_1"]["url"], 
+            index_1 = data["url_1"]["index"], 
+            interactive_1 = data["url_1"]["interactive"],
+            url_2 = data["url_2"]["url"], 
+            index_2 = data["url_2"]["index"], 
+            interactive_2 = data["url_2"]["interactive"],
+        )
+    except Exception as err:
+        print("ERROR saving urls comparison: ", err)
 
-
-def save_compare(data):
-    id_1 = data["url_1"]["id"]
-    id_2 = data["url_2"]["id"]
-    UrlCompareHistory.objects.get_or_create(url_1_id=id_1, url_2_id=id_2)
