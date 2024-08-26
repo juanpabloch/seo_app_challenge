@@ -21,18 +21,18 @@ class UrlSelectionForm(forms.Form):
 
     strategy = forms.ChoiceField(choices=CHOICES, label="Select a mode, default is Desktop")
 
-    def clean_url_1(self):
-        url = self.cleaned_data.get('url_1')
-        
-        if not url.startswith("https://"):
-            raise ValidationError("La URL debe comenzar con 'https://'")
+    def clean(self):
+        cleaned_data = super().clean()
+        url_1 = cleaned_data.get("url_1")
+        url_2 = cleaned_data.get("url_2")
 
-        return url
+        if not url_1.startswith("https://"):
+            self.add_error('url_1', "La URL debe comenzar con 'https://'")
 
-    def clean_url_2(self):
-        url = self.cleaned_data.get('url_2')
-        
-        if not url.startswith("https://"):
-            raise ValidationError("La URL debe comenzar con 'https://'")
+        if not url_2.startswith("https://"):
+            self.add_error('url_2', "La URL debe comenzar con 'https://'")
 
-        return url
+        if url_1 == url_2:
+            raise ValidationError("Las URLs deben ser distintas.")
+
+        return cleaned_data

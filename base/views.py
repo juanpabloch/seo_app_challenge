@@ -1,18 +1,19 @@
 from django.shortcuts import render, redirect
-import requests
 
 from base.forms import UrlSelectionForm
-from core import settings
+from base.services import get_url_db, process_data, save_compare
 # Create your views here.
 
 def home(request):
     if request.method == 'POST':
         form = UrlSelectionForm(request.POST)
         if form.is_valid():
-            print("PASO")
-            request.session['form_data'] = form.cleaned_data
+            data = {}
+            data["url_1"] = get_url_db(form.cleaned_data["url_1"], form.cleaned_data["strategy"])
+            data["url_2"] = get_url_db(form.cleaned_data["url_2"], form.cleaned_data["strategy"])
+
+            request.session['form_data'] = data
             return redirect('results')
-            
         else:
             return render(request, 'home.html', {"form": form})
     
@@ -28,26 +29,11 @@ def results(request):
     if not form_data:
         return redirect('home')
 
-    base_url = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?category=performance'
-    page = f'&url={form_data["url_1"]}'
-    strategy = f'&strategy={form_data["strategy"]}'
-    
-    if settings.API_KEY:
-        page += f'&key={settings.API_KEY}'
-
-    print(base_url + page + strategy)
-    # https://www.googleapis.com/pagespeedonline/v5/runPagespeed?category=performance&url=https://www.nelanegri.com/&key= AIzaSyCIIh9QB4M9pN5mtra_VjudRGS8cgDhWQ0 &strategy=desktop
-    # DATA:  {'url_1': 'https://www.nelanegri.com/', 'url_2': 'https://juanpabloch.github.io/porfolio_jp/', 'strategy': 'desktop'}
-    response = requests.get(base_url + page + strategy)
-    result = response.json()
-    data = {
-        "speed": result['lighthouseResult']['audits']['speed-index'],
-        "interactive": result['lighthouseResult']['audits']['interactive'],
-    }
-
+    data = {}
+    data["url_1"] = process_data(form_data["url_1"])
+    data["url_2"] = process_data(form_data["url_2"])
+    save_compare(data)
     request.session.flush()
-
-    print("DATA: ", data)
     context = {
         "data": data
     }
