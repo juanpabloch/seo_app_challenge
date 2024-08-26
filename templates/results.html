@@ -10,8 +10,33 @@
 
 <br><br>
 <section>
-    <p>speed: {{data.speed}}</p>
-    <p>interactive: {{data.interactive}}</p>
+    <p>URL: {{data.url_1.url}}</p>
+    <p>index: {{data.url_1.index}}</p>
+    <p>interactive: {{data.url_1.interactive}}</p>
+</section>
+<br><br>
+<section>
+    <p>URL: {{data.url_2.url}}</p>
+    <p>index: {{data.url_2.index}}</p>
+    <p>interactive: {{data.url_2.interactive}}</p>
 </section>
 
 {% endblock content %}
+
+
+{% comment %} 
+'speed': 'Speed Index shows how quickly the contents of a page are visibly populated.'
+'interactive': 'Time to Interactive is the amount of time it takes for the page to become fully interactive.' 
+
+▪ Speed Index
+    • Green (Good) – 0 to 3400 seconds 
+    • Orange (Moderate) – 3400 to 5800 seconds 
+    • Red (Slow) – over 5800 seconds 
+        
+▪ Time to Interactive
+    • Good - nothing to do here = TTI of 2468 milliseconds or less. 
+    • Ok, but consider improvement = TTI between 2468 and 3280 milliseconds. 
+    • Longer than recommended = TTI between 3280 and 4500 milliseconds. 
+
+
+{% endcomment %}
