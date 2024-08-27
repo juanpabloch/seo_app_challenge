@@ -1,6 +1,9 @@
 services:
   redis:
     image: redis:7.4.0-alpine
+    ports:
+      - 6379:6379
+
 
   app:
     container_name: seo_app
@@ -18,15 +21,18 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - redis
+
     volumes:
       - static_volume:/app/staticfiles
       - type: bind
         source: .
         target: /app
 
+
   db:
     image: mysql:8.0
-    container_name: seo_app_db
+    container_name: db_seo_app
     command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -51,6 +57,23 @@ services:
     ports:
       - 8080:80
 
+  celery:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    container_name: celery_seo_app
+    command: celery -A core.celery worker -l info
+    volumes:
+        - .:/app/
+    environment:
+            - CELERY_BROKER=redis://redis:6379/0
+            - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+        - db
+        - redis
+        - app
+
 volumes:
   db:
   static_volume:
+  celery:

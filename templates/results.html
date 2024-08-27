@@ -9,21 +9,58 @@
 </section>
 
 <br><br>
-<section>
-    <p>URL: {{data.url_1.url}}</p>
-    <p>index: {{data.url_1.index}}</p>
-    <p>interactive: {{data.url_1.interactive}}</p>
-</section>
-<br><br>
-<section>
-    <p>URL: {{data.url_2.url}}</p>
-    <p>index: {{data.url_2.index}}</p>
-    <p>interactive: {{data.url_2.interactive}}</p>
-</section>
+
+{% if status %}
+    <section>
+        <p>URL: {{data_1.url}}</p>
+        <p>index: {{data_1.index}}</p>
+        <p>interactive: {{data_1.interactive}}</p>
+    </section>
+    <br><br>
+    <section>
+        <p>URL: {{data_2.url}}</p>
+        <p>index: {{data_2.index}}</p>
+        <p>interactive: {{data_2.interactive}}</p>
+    </section>
+{% else %}
+    <section>
+        <p>Analizando las urls ...</p>
+    </section>
+{% endif %}
 
 {% endblock content %}
 
+{% block js %}
+<script>
+    let taskStatus = "{{ status }}"
+    const tasksID_1 = "{{url_1_id}}"
+    const tasksID_2 = "{{url_2_id}}"
+    const base_url = "{{ request.get_host }}" + '/check_task_status/?'
 
+    if(taskStatus == "False"){
+        checkTaskStatus(tasksID_1, tasksID_2)
+    }
+    
+    function checkTaskStatus(task1, task2){
+        console.log("Fetching...")
+        fetch('/check_task_status/?' + new URLSearchParams({
+            task1: task1,
+            task2: task2,
+        }).toString())
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.status);
+            if(data.status == "ready"){
+                window.location.href = '/results/';
+            }else{
+                setTimeout(function() {
+                    checkTaskStatus(tasksID_1, tasksID_2)
+                }, 2000);
+            }
+        });
+    }
+</script>
+{% endblock js %}
 {% comment %} 
 'speed': 'Speed Index shows how quickly the contents of a page are visibly populated.'
 'interactive': 'Time to Interactive is the amount of time it takes for the page to become fully interactive.' 
