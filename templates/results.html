@@ -35,7 +35,6 @@
     let taskStatus = "{{ status }}"
     const tasksID_1 = "{{url_1_id}}"
     const tasksID_2 = "{{url_2_id}}"
-    const base_url = "{{ request.get_host }}" + '/check_task_status/?'
 
     if(taskStatus == "False"){
         checkTaskStatus(tasksID_1, tasksID_2)
@@ -49,13 +48,20 @@
         }).toString())
         .then(response => response.json())
         .then(data => {
-            console.log(data.status);
+            console.log(data);
             if(data.status == "ready"){
-                window.location.href = '/results/';
+                window.location.reload()
             }else{
+                if(data.status == "almost"){
+                    if(data.task == "task1"){
+                        console.log("Ready task 1")
+                    }else if(data.task == "task2"){
+                        console.log("Ready task 2")
+                    }
+                }
                 setTimeout(function() {
                     checkTaskStatus(tasksID_1, tasksID_2)
-                }, 2000);
+                }, 1500);
             }
         });
     }
