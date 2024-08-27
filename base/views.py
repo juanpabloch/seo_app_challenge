@@ -47,6 +47,7 @@ def results(request):
         if result_1.successful() and result_2.successful():
             data_1 = result_1.result
             data_2 = result_2.result
+            save_urls_comparison({"url_1": data_1, "url_2": data_2, })
             return render(request, 'results.html', {"status": True, 'data_1': data_1, 'data_2': data_2})
         else:
             error_1 = result_1.result if not result_1.successful() else None
@@ -67,4 +68,8 @@ def check_task_status(request):
 
     if result_1.ready() and result_2.ready():
         return JsonResponse({"status": "ready"})
+    elif result_1.ready():
+        return JsonResponse({"status": "almost", "task": "task1"})
+    elif result_2.ready():
+        return JsonResponse({"status": "almost", "task": "task2"})
     return JsonResponse({"status": "pending"})

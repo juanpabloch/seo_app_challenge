@@ -34,7 +34,7 @@ def get_url_data(url, strategy):
 
 def save_urls_comparison(data):
     try:
-        UrlData.objects.create(
+        UrlData.objects.get_or_create(
             strategy = data["url_1"]["strategy"],
             url_1 = data["url_1"]["url"], 
             index_1 = data["url_1"]["index"], 
@@ -45,4 +45,3 @@ def save_urls_comparison(data):
         )
     except Exception as err:
         print("ERROR saving urls comparison: ", err)
-
