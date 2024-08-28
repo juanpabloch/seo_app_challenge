@@ -29,6 +29,7 @@ table th{
 h1{
     text-align: center;
     font-size: 4rem;
+    font-weight: 800;
 }
 
 .container{
@@ -43,7 +44,11 @@ h1{
 
 /* FORM */
 #compareForm{
-    margin-top: 35px;
+    margin-top: 10px;
+}
+
+.section_title{
+    margin-bottom: 0px;
 }
 
 .form_container{
@@ -77,6 +82,10 @@ input{
     .submit_btn{
         text-align: center;
     }
+    
+#compareForm input::placeholder {
+    opacity: 0.2;
+}
 
 .form_error{
     color: #e76f51;
@@ -143,6 +152,10 @@ input{
 }
 
 /* post */
+#results{
+    margin-top: 40px;
+}
+
 #results h1{
     margin-bottom: 0;
 }
@@ -300,6 +313,9 @@ input{
 }
 
 /* HISTORY */
+.section_title_two{
+    margin-top: 35px;
+}
 
 .history_filters{
     display: flex;
@@ -348,7 +364,7 @@ input{
     }
 
     section{
-        margin-top: 50px;
+        margin-top: 40px;
     }
 
     .back_btn{
