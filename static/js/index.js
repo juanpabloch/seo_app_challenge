@@ -9,21 +9,15 @@ submitBtn.addEventListener('click', e=>{
     const url1 = compareForm.url_1
     const url2 = compareForm.url_2
     const  strategy= compareForm.strategy
-    
-    console.log(urlValidator(url1.value))
+
     if (!urlValidator(url1.value)) {
         isValid = false
-        console.log(url1)
         url1.classList.add('is-invalid')
-    }else{
-        url1.classList.remove('is-invalid')
     }
 
     if (!urlValidator(url2.value)) {
         isValid = false
         url2.classList.add('is-invalid')
-    }else{
-        url2.classList.remove('is-invalid')
     }
 
     if(!STRATEGY.includes(strategy.value)){
@@ -49,3 +43,12 @@ function urlValidator(string) {
 
     return true
 }
+
+compareForm.url_1.addEventListener("input", (e)=>{
+    compareForm.url_1.classList.remove('is-invalid')
+})
+
+compareForm.url_2.addEventListener("input", (e)=>{
+    compareForm.url_2.classList.remove('is-invalid')
+})
+

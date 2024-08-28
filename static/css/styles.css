@@ -23,7 +23,7 @@ table tr{
 }
 
 table th{
-    height: 50px;
+    height: 66px;
 }
 
 h1{
@@ -329,11 +329,18 @@ input{
 }
 
 #urlsHistory .accordion-button span{
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 300;
     font-style: italic;
     margin: 0 20px;
 }
+
+@media screen and (max-width:1300px) {
+    .resutls_preview{
+        margin-top: 50px;
+    }
+}
+
 
 @media screen and (max-width:800px) {
     :root{
@@ -358,5 +365,9 @@ input{
 
     .item_delete_link img{
         width: 18px;
+    }
+
+    table th{
+        height: 68px;
     }
 }
