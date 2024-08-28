@@ -24,3 +24,4 @@ class UrlData(models.Model):
 
     class Meta:
         db_table = "url_data"
+        ordering = ["-id"]

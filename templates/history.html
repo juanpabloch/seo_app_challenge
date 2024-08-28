@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load custom_tags static %}
+
+{% block content %}
+
+<section class="section_title">
+    <h1>Historial</h1>
+</section>
+
+{% if data %}
+
+<section class="section_title_two">
+    <div class="back_btn"><a class="btn btn-outline-secondary" href="{% url 'home' %}">Volver</a></div>
+
+    <form action="" method="get">
+        <div class="history_filters">
+            <select class="form-select mb-4 me-3" name="strategy" id="strategy" onchange="this.form.submit()" style="max-width: 230px;">
+                <option value="" {% if filters.strategy == "" %}selected{% endif %}>Filtrar por dispositivo</option>
+                <option value="desktop" {% if filters.strategy == "desktop" %}selected{% endif %}>Desktop</option>
+                <option value="mobile" {% if filters.strategy == "mobile" %}selected{% endif %}>Mobile</option>
+            </select>
+            
+            <select class="form-select mb-4" name="order" id="order" onchange="this.form.submit()" style="max-width: 230px;">
+                <option value="" {% if filters.order == "" %}selected{% endif %}>Filtrar por antiguedad</option>
+                <option value="new" {% if filters.order == "new" %}selected{% endif %}>Nuevos</option>
+                <option value="old" {% if filters.order == "old" %}selected{% endif %}>Antiguos</option>
+            </select>
+        </div>
+    </form>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="accordion" id="urlsHistory">
+        {% for item in data %}
+        <div class="accordion-item mb-2">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                    {{ item.url_1 }} VS {{ item.url_2 }}
+                </button>
+            </h2>
+            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#urlsHistory">
+                <div class="accordion-body">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr class="table-active">
+                                <th scope="row">URL</th>
+                                <td class="url_text">{{ item.url_1 }}</td>
+                                <td class="url_text">{{ item.url_2 }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Speed Index <img class="tooltip_img" src="{% static 'img/tooltip.png' %}" alt="tooltip" data-bs-toggle="tooltip" data-bs-title="Indice que muestra qué tan rápido se llena visiblemente el contenido de una página."></th>
+                                <td>{{ item.index_1|colorChange:"index" }}</td>
+                                <td>{{ item.index_2|colorChange:"index" }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Time to Interactive <img class="tooltip_img" src="{% static 'img/tooltip.png' %}" alt="tooltip" data-bs-toggle="tooltip" data-bs-title="Cantidad de tiempo que tarda la página en volverse completamente interactiva."></th>
+                                <td>{{ item.interactive_1|colorChange:"interactive" }}</td>
+                                <td>{{ item.interactive_2|colorChange:"interactive" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="item_delete_link">
+                        <a href="{% url 'delete_history_item' item_id=item.id %}"><img src="{% static 'img/dustbin.png' %}" alt="" width="25"> Eliminar</a>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% else %}
+
+<section>
+    <p style="text-align: center;">No hay comparaciones para mostrar</p>
+    <div><a class="btn btn-outline-secondary" href="{% url 'home' %}">Volver</a></div>
+</section>
+
+{% endif %}
+
+
+{% comment %} 
+
+'id': 7, 
+'url_1': 'https://www.nelanegri.com/', 
+'url_2': 'https://juanpabloch.github.io/porfolio_jp/', 
+'strategy': 'desktop', 
+'index_1': 899.915, 
+'interactive_1': 2279.959, 
+'index_2': 699.369, 
+'interactive_2': 699.369 
+
+{% endcomment %}
+{% endblock content %}
+
+{% block js %}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+{% endblock js %}
