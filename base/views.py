@@ -8,7 +8,6 @@ from base.models import UrlData
 from base.forms import UrlSelectionForm
 from base.services import save_urls_comparison
 from base.task import get_url_data
-# Create your views here.
 
 STRATEGY = ["desktop", "mobile"]
 ORDER = ["new", "old"]
