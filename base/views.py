@@ -104,7 +104,7 @@ def history(request):
 
     if filters["order"] and filters["order"] in ORDER:
         data = data.order_by("-id") if filters["order"] == "new" else data.order_by("id")
-        
+
     context = {
         "data": data,
         "filters": filters
