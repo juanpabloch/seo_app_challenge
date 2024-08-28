@@ -1,36 +1,89 @@
 {% extends "base.html" %}
+{% load custom_tags static %}
 
 {% block content %}
 
-<section>
+<section class="section_title" id="results">
     <h1>Resultados</h1>
-
-    <a href="{% url 'home' %}">VOLVER</a>
+    <div class="result_strategy">
+        <p>{{ data_1.strategy|title }}</p>
+    </div>
 </section>
 
-<br><br>
-
 {% if status %}
-    <section>
-        <p>URL: {{data_1.url}}</p>
-        <p>index: {{data_1.index}}</p>
-        <p>interactive: {{data_1.interactive}}</p>
-    </section>
-    <br><br>
-    <section>
-        <p>URL: {{data_2.url}}</p>
-        <p>index: {{data_2.index}}</p>
-        <p>interactive: {{data_2.interactive}}</p>
-    </section>
+    <div class="results_table">
+        <table class="table table-hover">
+            <tbody>
+                <tr class="table-active">
+                    <th scope="row">URL</th>
+                    <td class="url_text">{{ data_1.url }}</td>
+                    <td class="url_text">{{ data_2.url }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Speed Index <img class="tooltip_img" src="{% static 'img/tooltip.png' %}" alt="tooltip" data-bs-toggle="tooltip" data-bs-title="Indice que muestra qué tan rápido se llena visiblemente el contenido de una página."></th>
+                    <td>{{ data_1.index|colorChange:"index" }}</td>
+                    <td>{{ data_2.index|colorChange:"index" }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Time to Interactive <img class="tooltip_img" src="{% static 'img/tooltip.png' %}" alt="tooltip" data-bs-toggle="tooltip" data-bs-title="Cantidad de tiempo que tarda la página en volverse completamente interactiva."></th>
+                    <td>{{ data_1.interactive|colorChange:"interactive" }}</td>
+                    <td>{{ data_2.interactive|colorChange:"interactive" }}</td>
+                </tr>
+            </tbody>
+          </table>
+
+          {% comment %} <small class="reference">Speed Index <span class="green_box"></span><span>Good</span></small>
+          <br>
+          <small class="reference">Time to Interactive <span></span></small> {% endcomment %}
+    </div>
+    
 {% else %}
     <section>
-        <p>Analizando las urls ...</p>
+        <div class="results_info_text">
+            <p>Analizando las urls ...</p>
+            <small>Este proceso puede tardar algunos segundos</small>
+        </div>
+        <div class="urls_check">
+            <div class="url1_checker check_display">
+                <p>{{ url1_text }}</p>
+                <div class="loader">
+                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                </div>
+                <div class="success" style="display:none;">
+                    {% include "share/check_icon.html" %}
+                </div>
+                <div class="error" style="display:none;">
+                    <img src="{% static 'img/alert.png' %}" alt="">
+                </div>
+            </div>
+            <div class="vs_text">VS</div>
+            <div class="url2_checker check_display">
+                <p>{{ url2_text }}</p>
+                <div class="loader">
+                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>   
+                </div>
+                <div class="success" style="display:none;">
+                    {% include "share/check_icon.html" %}
+                </div>
+                <div class="error" style="display:none;">
+                    <img src="{% static 'img/alert.png' %}" alt="">
+                </div>
+            </div>
+        </div>
     </section>
+    <div class="error_proccess_url">Hubo un problema al procesar una de las URLs. Por favor, inténtalo de nuevo en unos segundos.</div>
 {% endif %}
+<section class="return_btn {% if status %}{% else %}d-none{% endif %}">
+    <a class="btn btn-outline-secondary" href="{% url 'home' %}">Volver</a>
+</section>
 
 {% endblock content %}
 
 {% block js %}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
 <script>
     let taskStatus = "{{ status }}"
     const tasksID_1 = "{{url_1_id}}"
@@ -48,38 +101,48 @@
         }).toString())
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+
             if(data.status == "ready"){
-                window.location.reload()
+                showCheck('.url1_checker')
+                showCheck('.url2_checker')
+                setTimeout(function() {
+                    window.location.reload()
+                }, 900);
             }else{
                 if(data.status == "almost"){
                     if(data.task == "task1"){
-                        console.log("Ready task 1")
+                        showCheck('.url1_checker')
                     }else if(data.task == "task2"){
-                        console.log("Ready task 2")
+                        showCheck('.url2_checker')
                     }
                 }
-                setTimeout(function() {
-                    checkTaskStatus(tasksID_1, tasksID_2)
-                }, 1500);
+                if(data.status == "error"){
+                    if(data.task == "task1"){
+                        showError('.url1_checker')
+                    }else if(data.task == "task2"){
+                        showError('.url2_checker')
+                    }
+                    document.querySelector('.return_btn').classList.remove('d-none')
+                    document.querySelector('.error_proccess_url').style.display = "block"
+                }else{
+                    setTimeout(function() {
+                        checkTaskStatus(tasksID_1, tasksID_2)
+                    }, 1500);
+                }
             }
         });
     }
+
+    function showCheck(element){
+        const successDiv = document.querySelector(element)
+        successDiv.querySelector('.success').style.display = "block"
+        successDiv.querySelector('.loader').style.display = "none"
+    }
+
+    function showError(element){
+        const successDiv = document.querySelector(element)
+        successDiv.querySelector('.error').style.display = "block"
+        successDiv.querySelector('.loader').style.display = "none"
+    }
 </script>
 {% endblock js %}
-{% comment %} 
-'speed': 'Speed Index shows how quickly the contents of a page are visibly populated.'
-'interactive': 'Time to Interactive is the amount of time it takes for the page to become fully interactive.' 
-
-▪ Speed Index
-    • Green (Good) – 0 to 3400 seconds 
-    • Orange (Moderate) – 3400 to 5800 seconds 
-    • Red (Slow) – over 5800 seconds 
-        
-▪ Time to Interactive
-    • Good - nothing to do here = TTI of 2468 milliseconds or less. 
-    • Ok, but consider improvement = TTI between 2468 and 3280 milliseconds. 
-    • Longer than recommended = TTI between 3280 and 4500 milliseconds. 
-
-
-{% endcomment %}

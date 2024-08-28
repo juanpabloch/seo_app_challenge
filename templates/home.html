@@ -1,16 +1,54 @@
 {% extends "base.html" %}
 
+
 {% block content %}
 
-<section>
-    <h1>SEO app</h1>
+<section class="section_title">
+    <h1>SEO APP</h1>
+    <div class="history_btn_container">
+        <a class="btn btn-outline-secondary" href="{% url 'history' %}">Historial</a>
+    </div>
 </section>
 
-<section>
+<section id="compareForm">
     <form action="" method="post">
         {% csrf_token %}
-        {{form.as_p}}
-        <input type="submit" value="Compare">
+        <div class="form_container">
+            {% for field in form %}
+            <div class="url{{ forloop.counter }}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                
+                {% if field.field.widget.input_type == 'select' %}
+                    <select class="form-select" name="{{ field.name }}" id="{{ field.id_for_label }}">
+                        {% for choice in field.field.choices %}
+                            <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>
+                                {{ choice.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input class="form-control" type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{% if field.value %}{{ field.value }}{% endif %}" placeholder="{{ field.field.widget.attrs.placeholder|default_if_none:'' }}" required>
+                    <small class="form_error">{{ field.errors.0 }}</small>
+                    <small id="{{ field.id_for_label }}Feedback" class="invalid-feedback">
+                        La URL debe tener el formato: https://example.com
+                    </small>
+                
+                    {% if field.help_text %}
+                        <small class="form-text">{{ field.help_text }}</small>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+        <div class="form_non_field_errors">
+            {% for err in form.non_field_errors %}
+            <small>{{ err }}</small>
+            {% endfor %}
+        </div>
+        <div class="submit_btn">
+            <input type="submit" class="btn btn-outline-secondary" value="Comparar">
+        </div>
     </form>
 </section>
 
