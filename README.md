@@ -10,6 +10,7 @@
    * Abre tu terminal o línea de comandos.
    * Crea una nueva carpeta para tu proyecto:
         mkdir mi-proyecto
+     
         cd mi-proyecto
 
    * Clona el repositorio:
