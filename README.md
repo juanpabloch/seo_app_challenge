@@ -46,7 +46,7 @@
 
    * Asegúrate de que todos los contenedores estén en estado "Up".
     
-    * Accede a la Aplicación:
+  * Accede a la Aplicación:
     * Abre tu navegador web y ve a la siguiente dirección:
 
       http://127.0.0.1:8000
