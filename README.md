@@ -22,7 +22,7 @@
 
     * Edita el archivo .env y completa las variables de entorno necesarias para tu proyecto.
     
-    * Levanta la Aplicación:
+* Levanta la Aplicación:
     * Navega hasta el directorio raíz de tu proyecto:
         cd seo_app_challenge
 
